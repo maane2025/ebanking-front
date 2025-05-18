@@ -21,10 +21,10 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatDatepickerModule
+    MatDatepickerModule,
   ],
   templateUrl: './customer-form.component.html',
-  styleUrls: ['./customer-form.component.css']
+  styleUrls: ['./customer-form.component.css'],
 })
 export class CustomerFormComponent implements OnInit {
   isEditMode = false;
@@ -39,11 +39,8 @@ export class CustomerFormComponent implements OnInit {
     private customerService: CustomerService
   ) {
     this.customerForm = this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', Validators.required],
-      address: ['', Validators.required]
     });
   }
 
@@ -60,11 +57,11 @@ export class CustomerFormComponent implements OnInit {
     this.customerService.getCustomer(Number(id)).subscribe({
       next: (customer) => {
         this.customerForm.patchValue({
-          firstName: customer.name,
+          name: customer.name,
           email: customer.email,
         });
       },
-      error: (err) => console.error('Failed to load customer', err)
+      error: (err) => console.error('Failed to load customer', err),
     });
   }
 
@@ -74,14 +71,16 @@ export class CustomerFormComponent implements OnInit {
     const customerData = this.customerForm.value as Omit<Customer, 'id'>;
 
     if (this.isEditMode && this.customerId) {
-      this.customerService.updateCustomer(Number(this.customerId), customerData).subscribe({
-        next: () => this.router.navigate(['/customers', this.customerId]),
-        error: (err) => console.error('Failed to update customer', err)
-      });
+      this.customerService
+        .updateCustomer(Number(this.customerId), customerData)
+        .subscribe({
+          next: () => this.router.navigate(['/customers', this.customerId]),
+          error: (err) => console.error('Failed to update customer', err),
+        });
     } else {
       this.customerService.createCustomer(customerData).subscribe({
         next: (customer) => this.router.navigate(['/customers', customer.id]),
-        error: (err) => console.error('Failed to create customer', err)
+        error: (err) => console.error('Failed to create customer', err),
       });
     }
   }
