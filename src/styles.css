@@ -1,1 +1,44 @@
-/* You can add global styles to this file, and also import other style files */
+/* Import Angular Material pre-built theme (alternative to SCSS theming) */
+/* @import "~@angular/material/prebuilt-themes/indigo-pink.css"; */
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+mat-card {
+  margin: 16px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+mat-card mat-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: max-content auto;
+  gap: 16px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.no-history {
+  padding: 16px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.6);
+}

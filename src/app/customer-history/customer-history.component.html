@@ -1,0 +1,34 @@
+<mat-card *ngIf="history.length > 0">
+    <mat-card-header>
+      <mat-card-title>Customer History</mat-card-title>
+    </mat-card-header>
+  
+    <mat-card-content>
+      <table mat-table [dataSource]="history">
+        <!-- Action Column -->
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef>Action</th>
+          <td mat-cell *matCellDef="let item">{{ item.action }}</td>
+        </ng-container>
+  
+        <!-- Details Column -->
+        <ng-container matColumnDef="details">
+          <th mat-header-cell *matHeaderCellDef>Details</th>
+          <td mat-cell *matCellDef="let item">{{ item.details }}</td>
+        </ng-container>
+  
+        <!-- Timestamp Column -->
+        <ng-container matColumnDef="timestamp">
+          <th mat-header-cell *matHeaderCellDef>Date</th>
+          <td mat-cell *matCellDef="let item">{{ item.timestamp | date:'medium' }}</td>
+        </ng-container>
+  
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+  
+  <div *ngIf="history.length === 0" class="no-history">
+    No history available for this customer.
+  </div>

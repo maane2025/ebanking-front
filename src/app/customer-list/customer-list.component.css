@@ -1,0 +1,17 @@
+mat-card {
+    margin: 16px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  mat-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16px;
+  }
+  
+  table {
+    width: 100%;
+  }

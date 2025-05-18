@@ -1,0 +1,30 @@
+<ng-container *ngIf="customer">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>
+          {{ customer.firstName }} {{ customer.lastName }}
+        </mat-card-title>
+        <mat-card-subtitle>Customer Details</mat-card-subtitle>
+        <button mat-icon-button [routerLink]="['/customers', customer.id, 'edit']">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </mat-card-header>
+  
+      <mat-card-content>
+        <mat-tab-group [(selectedIndex)]="activeTab">
+          <mat-tab label="Details">
+            <div class="details-grid">
+              <div><strong>Email:</strong> {{ customer.email }}</div>
+              <div><strong>Phone:</strong> {{ customer.phone }}</div>
+              <div><strong>Address:</strong> {{ customer.address }}</div>
+              <div><strong>Created:</strong> {{ customer.createdAt | date }}</div>
+              <div><strong>Last Updated:</strong> {{ customer.updatedAt | date }}</div>
+            </div>
+          </mat-tab>
+          <!-- <mat-tab label="History">
+            <app-customer-history [history]="history"></app-customer-history>
+          </mat-tab> -->
+        </mat-tab-group>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
