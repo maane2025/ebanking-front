@@ -5,12 +5,14 @@
 <!-- Debug Controls -->
 <div
   *ngIf="!account && !isLoading && accounts.length === 0 && !apiError"
-  class="debug-controls"
+  class="d-flex justify-content-center gap-2 my-4 p-3 bg-light border border-2 border-dashed rounded"
 >
-  <button mat-raised-button color="warn" (click)="loadTestData()">
-    Load Test Data (Debug)
+  <button class="btn btn-danger" (click)="loadTestData()">
+    <i class="bi bi-database-fill-gear me-1"></i>
+    Load Test Data
   </button>
-  <button mat-raised-button color="primary" (click)="testDirectApiCall()">
+  <button class="btn btn-primary" (click)="testDirectApiCall()">
+    <i class="bi bi-cloud-arrow-down me-1"></i>
     Test Direct API Call
   </button>
 </div>
@@ -97,11 +99,8 @@
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef>Actions</th>
           <td mat-cell *matCellDef="let account">
-            <button
-              mat-raised-button
-              color="primary"
-              (click)="selectAccount(account.id)"
-            >
+            <button class="btn btn-primary" (click)="selectAccount(account.id)">
+              <i class="bi bi-eye me-1"></i>
               View Details
             </button>
           </td>
@@ -127,11 +126,13 @@
       <p>
         There are no accounts in the system or there was an error loading them.
       </p>
-      <div class="action-buttons">
-        <button mat-raised-button color="primary" routerLink="/customers">
+      <div class="d-flex gap-2 mt-3">
+        <a class="btn btn-primary" routerLink="/customers">
+          <i class="bi bi-people me-1"></i>
           Go to Customers
-        </button>
-        <button mat-raised-button color="accent" (click)="reloadAccounts()">
+        </a>
+        <button class="btn btn-secondary" (click)="reloadAccounts()">
+          <i class="bi bi-arrow-clockwise me-1"></i>
           Retry Loading Accounts
         </button>
       </div>
@@ -153,11 +154,13 @@
       <div class="error-details">
         <pre>{{ apiError }}</pre>
       </div>
-      <div class="action-buttons">
-        <button mat-raised-button color="primary" routerLink="/customers">
+      <div class="d-flex gap-2 mt-3">
+        <a class="btn btn-primary" routerLink="/customers">
+          <i class="bi bi-people me-1"></i>
           Go to Customers
-        </button>
-        <button mat-raised-button color="accent" (click)="reloadAccounts()">
+        </a>
+        <button class="btn btn-secondary" (click)="reloadAccounts()">
+          <i class="bi bi-arrow-clockwise me-1"></i>
           Retry Loading Accounts
         </button>
       </div>
@@ -169,14 +172,10 @@
   <mat-card-header>
     <mat-card-title>Account {{ account.id }}</mat-card-title>
     <mat-card-subtitle>{{ account.type }} Account</mat-card-subtitle>
-    <button
-      mat-raised-button
-      color="primary"
-      routerLink="/accounts"
-      class="back-button"
-    >
+    <a class="btn btn-outline-primary" routerLink="/accounts">
+      <i class="bi bi-arrow-left me-1"></i>
       Back to All Accounts
-    </button>
+    </a>
   </mat-card-header>
 
   <mat-card-content>
@@ -206,22 +205,20 @@
           <div><strong>Email:</strong> {{ account.customer.email }}</div>
         </div>
 
-        <div class="account-actions">
-          <button
-            mat-raised-button
-            color="primary"
-            (click)="performOperation('credit')"
-          >
+        <div class="d-flex gap-2 mt-4">
+          <button class="btn btn-success" (click)="performOperation('credit')">
+            <i class="bi bi-plus-circle me-1"></i>
             Credit
           </button>
-          <button
-            mat-raised-button
-            color="warn"
-            (click)="performOperation('debit')"
-          >
+          <button class="btn btn-danger" (click)="performOperation('debit')">
+            <i class="bi bi-dash-circle me-1"></i>
             Debit
           </button>
-          <button mat-raised-button (click)="performOperation('transfer')">
+          <button
+            class="btn btn-primary"
+            (click)="performOperation('transfer')"
+          >
+            <i class="bi bi-arrow-left-right me-1"></i>
             Transfer
           </button>
         </div>

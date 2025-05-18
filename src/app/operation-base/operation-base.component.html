@@ -1,39 +1,57 @@
 <mat-card *ngIf="account">
-    <mat-card-header>
-      <mat-card-title>{{ account.id }} - {{ account.type }} Account</mat-card-title>
-      <mat-card-subtitle>Balance: {{ account.balance | currency }}</mat-card-subtitle>
-    </mat-card-header>
-  
-    <mat-card-content>
-      <form [formGroup]="operationForm" (ngSubmit)="performOperation()">
-        <mat-form-field appearance="outline">
-          <mat-label>Amount</mat-label>
-          <input matInput type="number" formControlName="amount" required>
-          <mat-error *ngIf="operationForm.get('amount')?.hasError('required')">
-            Amount is required
-          </mat-error>
-          <mat-error *ngIf="operationForm.get('amount')?.hasError('min')">
-            Amount must be positive
-          </mat-error>
-        </mat-form-field>
-  
-        <mat-form-field appearance="outline">
-          <mat-label>Description</mat-label>
-          <textarea matInput formControlName="description" required></textarea>
-          <mat-error *ngIf="operationForm.get('description')?.hasError('required')">
-            Description is required
-          </mat-error>
-        </mat-form-field>
-  
-        <div class="form-actions">
-          <button mat-raised-button type="button" routerLink="/accounts/{{account.id}}">
-            Cancel
-          </button>
-          <button mat-raised-button color="primary" type="submit" [disabled]="operationForm.invalid || isLoading">
-            <span *ngIf="!isLoading">Submit</span>
-            <mat-spinner *ngIf="isLoading" diameter="24"></mat-spinner>
-          </button>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+  <mat-card-header>
+    <mat-card-title
+      >{{ account.id }} - {{ account.type }} Account</mat-card-title
+    >
+    <mat-card-subtitle
+      >Balance: {{ account.balance | currency }}</mat-card-subtitle
+    >
+  </mat-card-header>
+
+  <mat-card-content>
+    <form [formGroup]="operationForm" (ngSubmit)="performOperation()">
+      <mat-form-field appearance="outline">
+        <mat-label>Amount</mat-label>
+        <input matInput type="number" formControlName="amount" required />
+        <mat-error *ngIf="operationForm.get('amount')?.hasError('required')">
+          Amount is required
+        </mat-error>
+        <mat-error *ngIf="operationForm.get('amount')?.hasError('min')">
+          Amount must be positive
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description" required></textarea>
+        <mat-error
+          *ngIf="operationForm.get('description')?.hasError('required')"
+        >
+          Description is required
+        </mat-error>
+      </mat-form-field>
+
+      <div class="d-flex justify-content-end gap-2 mt-4">
+        <a class="btn btn-secondary" routerLink="/accounts/{{ account.id }}">
+          <i class="bi bi-x-circle me-1"></i> Cancel
+        </a>
+        <button
+          class="btn btn-primary"
+          type="submit"
+          [disabled]="operationForm.invalid || isLoading"
+        >
+          <span *ngIf="!isLoading">
+            <i class="bi bi-check-circle me-1"></i> Submit
+          </span>
+          <span
+            *ngIf="isLoading"
+            class="spinner-border spinner-border-sm me-1"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          <span *ngIf="isLoading">Processing...</span>
+        </button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

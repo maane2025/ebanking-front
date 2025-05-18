@@ -37,22 +37,27 @@
         </mat-error>
       </mat-form-field>
 
-      <div class="form-actions">
-        <button
-          mat-raised-button
-          type="button"
-          routerLink="/customers/{{ customerId }}"
-        >
+      <div class="d-flex justify-content-end gap-2 mt-4">
+        <a class="btn btn-secondary" routerLink="/customers/{{ customerId }}">
+          <i class="bi bi-x-circle me-1"></i>
           Cancel
-        </button>
+        </a>
         <button
-          mat-raised-button
-          color="primary"
+          class="btn btn-primary"
           type="submit"
           [disabled]="accountForm.invalid || isLoading"
         >
-          <span *ngIf="!isLoading">Create Account</span>
-          <mat-spinner *ngIf="isLoading" diameter="24"></mat-spinner>
+          <span *ngIf="!isLoading">
+            <i class="bi bi-plus-circle me-1"></i>
+            Create Account
+          </span>
+          <span
+            *ngIf="isLoading"
+            class="spinner-border spinner-border-sm me-1"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          <span *ngIf="isLoading">Creating...</span>
         </button>
       </div>
     </form>
