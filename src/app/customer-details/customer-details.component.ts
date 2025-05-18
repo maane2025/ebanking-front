@@ -23,17 +23,17 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatIconModule,
     MatTableModule,
     MatProgressSpinnerModule,
-    RouterModule
+    RouterModule,
   ],
   templateUrl: './customer-details.component.html',
-  styleUrls: ['./customer-details.component.css']
+  styleUrls: ['./customer-details.component.css'],
 })
 export class CustomerDetailsComponent implements OnInit {
   customer?: Customer;
   accounts: BankAccount[] = [];
   isLoading = false;
   activeTab = 0;
-  
+
   displayedColumns: string[] = ['id', 'type', 'balance', 'actions'];
 
   constructor(
@@ -61,7 +61,7 @@ export class CustomerDetailsComponent implements OnInit {
       error: (err) => {
         console.error('Failed to load customer', err);
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -69,18 +69,27 @@ export class CustomerDetailsComponent implements OnInit {
     this.isLoading = true;
     this.accountService.getAccounts().subscribe({
       next: (accounts) => {
-        this.accounts = accounts.filter(acc => acc.customerId === customerId);
+        this.accounts = accounts.filter((acc) => acc.customer.id === customerId);
         this.isLoading = false;
       },
       error: (err) => {
         console.error('Failed to load accounts', err);
         this.isLoading = false;
-      }
+      },
     });
   }
 
   viewAccount(accountId: string): void {
     this.router.navigate(['/accounts', accountId]);
+  }
+
+  viewAllAccounts(): void {
+    if (this.customer) {
+      // Navigate to accounts page with customer ID as query parameter
+      this.router.navigate(['/accounts'], {
+        queryParams: { customerId: this.customer.id },
+      });
+    }
   }
 
   createAccount(): void {

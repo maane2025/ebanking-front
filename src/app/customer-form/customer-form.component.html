@@ -6,7 +6,7 @@
   </mat-card-header>
 
   <mat-card-content>
-    <form [formGroup]="customerForm" (ngSubmit)="onSubmit()">
+    <form [formGroup]="customerForm" (ngSubmit)="onSubmit()" #form="ngForm">
       <mat-form-field appearance="fill">
         <mat-label>Name</mat-label>
         <input matInput formControlName="name" required />
@@ -38,6 +38,18 @@
         >
           {{ isEditMode ? "Update" : "Save" }}
         </button>
+        <button
+          mat-raised-button
+          color="accent"
+          type="button"
+          (click)="debugForm()"
+        >
+          Debug
+        </button>
+      </div>
+
+      <div *ngIf="formErrors" class="form-errors">
+        <pre>{{ formErrors | json }}</pre>
       </div>
     </form>
   </mat-card-content>

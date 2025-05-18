@@ -1,0 +1,47 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Transfer Funds</mat-card-title>
+    <mat-card-subtitle>From Account: {{ accountId }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <form [formGroup]="transferForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="outline">
+        <mat-label>Destination Account ID</mat-label>
+        <input matInput formControlName="accountDestination" required>
+        <mat-error *ngIf="transferForm.get('accountDestination')?.hasError('required')">
+          Destination account is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Amount</mat-label>
+        <input matInput type="number" formControlName="amount" required>
+        <mat-error *ngIf="transferForm.get('amount')?.hasError('required')">
+          Amount is required
+        </mat-error>
+        <mat-error *ngIf="transferForm.get('amount')?.hasError('min')">
+          Amount must be positive
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description" required></textarea>
+        <mat-error *ngIf="transferForm.get('description')?.hasError('required')">
+          Description is required
+        </mat-error>
+      </mat-form-field>
+
+      <div class="form-actions">
+        <button mat-raised-button type="button" routerLink="/accounts/{{accountId}}">
+          Cancel
+        </button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="transferForm.invalid || isLoading">
+          <span *ngIf="!isLoading">Transfer</span>
+          <mat-spinner *ngIf="isLoading" diameter="24"></mat-spinner>
+        </button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

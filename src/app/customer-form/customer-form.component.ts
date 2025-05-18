@@ -29,6 +29,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 export class CustomerFormComponent implements OnInit {
   isEditMode = false;
   customerId?: string;
+  formErrors: any = null;
 
   customerForm;
 
@@ -45,11 +46,17 @@ export class CustomerFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log('CustomerFormComponent initialized');
     const id = this.route.snapshot.paramMap.get('id');
+    console.log('Route param id:', id);
+
     if (id && id !== 'new') {
       this.isEditMode = true;
       this.customerId = id;
+      console.log('Edit mode activated for customer ID:', id);
       this.loadCustomer(id);
+    } else {
+      console.log('Create new customer mode');
     }
   }
 
@@ -66,22 +73,60 @@ export class CustomerFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.customerForm.invalid) return;
+    console.log('Form submitted');
+
+    if (this.customerForm.invalid) {
+      console.log('Form is invalid:', this.customerForm.errors);
+      return;
+    }
 
     const customerData = this.customerForm.value as Omit<Customer, 'id'>;
+    console.log('Customer data to submit:', customerData);
 
     if (this.isEditMode && this.customerId) {
+      console.log('Updating customer with ID:', this.customerId);
       this.customerService
         .updateCustomer(Number(this.customerId), customerData)
         .subscribe({
-          next: () => this.router.navigate(['/customers', this.customerId]),
-          error: (err) => console.error('Failed to update customer', err),
+          next: (response) => {
+            console.log('Customer updated successfully:', response);
+            this.router.navigate(['/customers', this.customerId]);
+          },
+          error: (err) => {
+            console.error('Failed to update customer', err);
+            alert(
+              'Failed to update customer: ' + (err.message || 'Unknown error')
+            );
+          },
         });
     } else {
+      console.log('Creating new customer');
       this.customerService.createCustomer(customerData).subscribe({
-        next: (customer) => this.router.navigate(['/customers', customer.id]),
-        error: (err) => console.error('Failed to create customer', err),
+        next: (customer) => {
+          console.log('Customer created successfully:', customer);
+          this.router.navigate(['/customers', customer.id]);
+        },
+        error: (err) => {
+          console.error('Failed to create customer', err);
+          alert(
+            'Failed to create customer: ' + (err.message || 'Unknown error')
+          );
+        },
       });
     }
+  }
+
+  debugForm(): void {
+    console.log('Debug form clicked');
+    this.formErrors = {
+      formValue: this.customerForm.value,
+      formStatus: this.customerForm.status,
+      formValid: this.customerForm.valid,
+      formInvalid: this.customerForm.invalid,
+      formErrors: this.customerForm.errors,
+      nameErrors: this.customerForm.get('name')?.errors,
+      emailErrors: this.customerForm.get('email')?.errors,
+    };
+    console.log('Form debug info:', this.formErrors);
   }
 }

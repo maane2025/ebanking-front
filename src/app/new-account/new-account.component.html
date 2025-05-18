@@ -1,0 +1,60 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Create New Account</mat-card-title>
+    <mat-card-subtitle *ngIf="customer"
+      >For Customer: {{ customer.name }}</mat-card-subtitle
+    >
+  </mat-card-header>
+
+  <mat-card-content>
+    <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="outline">
+        <mat-label>Account Type</mat-label>
+        <mat-select formControlName="type" required>
+          <mat-option value="CurrentAccount">Current Account</mat-option>
+          <mat-option value="SavingAccount">Savings Account</mat-option>
+        </mat-select>
+        <mat-error *ngIf="accountForm.get('type')?.hasError('required')">
+          Account type is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Initial Balance</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="initialBalance"
+          required
+        />
+        <mat-error
+          *ngIf="accountForm.get('initialBalance')?.hasError('required')"
+        >
+          Initial balance is required
+        </mat-error>
+        <mat-error *ngIf="accountForm.get('initialBalance')?.hasError('min')">
+          Initial balance must be non-negative
+        </mat-error>
+      </mat-form-field>
+
+      <div class="form-actions">
+        <button
+          mat-raised-button
+          type="button"
+          routerLink="/customers/{{ customerId }}"
+        >
+          Cancel
+        </button>
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="accountForm.invalid || isLoading"
+        >
+          <span *ngIf="!isLoading">Create Account</span>
+          <mat-spinner *ngIf="isLoading" diameter="24"></mat-spinner>
+        </button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

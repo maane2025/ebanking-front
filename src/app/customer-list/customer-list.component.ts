@@ -25,10 +25,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatFormFieldModule,
     FormsModule,
     MatProgressSpinnerModule,
-    RouterModule
+    RouterModule,
   ],
   templateUrl: './customer-list.component.html',
-  styleUrls: ['./customer-list.component.css']
+  styleUrls: ['./customer-list.component.css'],
 })
 export class CustomerListComponent implements OnInit {
   customers: Customer[] = [];
@@ -55,7 +55,7 @@ export class CustomerListComponent implements OnInit {
       error: (err) => {
         console.error('Failed to load customers', err);
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -74,27 +74,36 @@ export class CustomerListComponent implements OnInit {
       error: (err) => {
         console.error('Failed to search customers', err);
         this.isLoading = false;
-      }
+      },
     });
   }
 
   editCustomer(id: number): void {
-    this.router.navigate(['/customers', id, 'edit']);
+    console.log('Edit customer called with ID:', id);
+    this.router.navigate(['/customers/edit', id]);
   }
 
   deleteCustomer(id: number): void {
+    console.log('Delete customer called with ID:', id);
     if (confirm('Are you sure you want to delete this customer?')) {
       this.isLoading = true;
+      console.log('Deleting customer with ID:', id);
       this.customerService.deleteCustomer(id).subscribe({
         next: () => {
+          console.log('Customer deleted successfully');
           this.loadCustomers();
           this.isLoading = false;
         },
         error: (err) => {
           console.error('Failed to delete customer', err);
+          alert(
+            'Failed to delete customer: ' + (err.message || 'Unknown error')
+          );
           this.isLoading = false;
-        }
+        },
       });
+    } else {
+      console.log('Delete cancelled by user');
     }
   }
 }

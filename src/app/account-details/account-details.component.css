@@ -1,0 +1,150 @@
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.account-actions {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  margin: 50px 0;
+}
+
+.no-results {
+  text-align: center;
+  margin: 20px 0;
+  color: #666;
+}
+
+.no-account-selected {
+  max-width: 600px;
+  margin: 50px auto;
+  text-align: center;
+}
+
+.no-account-selected p {
+  margin-bottom: 20px;
+}
+
+.accounts-list {
+  max-width: 1000px;
+  margin: 20px auto;
+}
+
+.accounts-list table {
+  width: 100%;
+}
+
+.accounts-list .mat-column-actions {
+  text-align: right;
+  width: 150px;
+}
+
+.back-button {
+  margin-left: auto;
+}
+
+.card-actions {
+  margin-left: auto;
+}
+
+.credit {
+  color: green;
+}
+
+.debit {
+  color: red;
+}
+
+.account-id {
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.account-type {
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.account-type.saving {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+.account-type.current {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.balance-cell {
+  font-weight: bold;
+}
+
+.customer-info {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.api-error {
+  max-width: 800px;
+  margin: 50px auto;
+}
+
+.error-details {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.error-details pre {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.debug-controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  border: 1px dashed #ccc;
+}
+
+.balance-info {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin: 20px 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-actions {
+    flex-direction: column;
+  }
+}

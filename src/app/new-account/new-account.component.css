@@ -17,20 +17,6 @@ mat-form-field {
   margin-top: 20px;
 }
 
-/* Form errors debug section */
-.form-errors {
-  margin-top: 20px;
-  padding: 10px;
-  background-color: #f8f9fa;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.form-errors pre {
-  margin: 0;
-  white-space: pre-wrap;
-}
-
 /* Add responsive styling */
 @media (max-width: 768px) {
   mat-card {

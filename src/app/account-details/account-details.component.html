@@ -1,118 +1,330 @@
-<mat-card *ngIf="account">
+<div class="loading-spinner" *ngIf="isLoading">
+  <mat-spinner diameter="50"></mat-spinner>
+</div>
+
+<!-- Debug Controls -->
+<div
+  *ngIf="!account && !isLoading && accounts.length === 0 && !apiError"
+  class="debug-controls"
+>
+  <button mat-raised-button color="warn" (click)="loadTestData()">
+    Load Test Data (Debug)
+  </button>
+  <button mat-raised-button color="primary" (click)="testDirectApiCall()">
+    Test Direct API Call
+  </button>
+</div>
+
+<!-- All Accounts View -->
+<div
+  *ngIf="!account && !isLoading && accounts.length > 0"
+  class="accounts-list"
+>
+  <mat-card>
     <mat-card-header>
-      <mat-card-title>Account {{ account.id }}</mat-card-title>
-      <mat-card-subtitle>{{ account.type }} Account</mat-card-subtitle>
+      <mat-card-title>
+        <span *ngIf="!customerName">All Accounts</span>
+        <span *ngIf="customerName">Accounts for {{ customerName }}</span>
+      </mat-card-title>
+      <mat-card-subtitle>Select an account to view details</mat-card-subtitle>
+      <div class="card-actions" *ngIf="customerName">
+        <button
+          mat-raised-button
+          color="accent"
+          (click)="clearCustomerFilter()"
+        >
+          Show All Accounts
+        </button>
+      </div>
     </mat-card-header>
-  
     <mat-card-content>
-      <mat-tab-group [(selectedIndex)]="activeTab">
-        <mat-tab label="Overview">
-          <div class="details-grid">
-            <div><strong>Account ID:</strong> {{ account.id }}</div>
-            <div><strong>Type:</strong> {{ account.type }}</div>
-            <div><strong>Balance:</strong> {{ account.balance | currency }}</div>
-            <div><strong>Created:</strong> {{ account.createdAt | date }}</div>
-          </div>
-  
-          <div class="account-actions">
-            <button mat-raised-button color="primary" (click)="performOperation('credit')">
-              Credit
+      <table mat-table [dataSource]="accounts" class="mat-elevation-z8">
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>Account ID</th>
+          <td mat-cell *matCellDef="let account">
+            <span class="account-id">{{ account.id.substring(0, 8) }}...</span>
+          </td>
+        </ng-container>
+
+        <!-- Type Column -->
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>Type</th>
+          <td mat-cell *matCellDef="let account">
+            <span
+              class="account-type"
+              [ngClass]="{
+                saving: account.type === 'SavingAccount',
+                current: account.type === 'CurrentAccount'
+              }"
+            >
+              {{ account.type === "SavingAccount" ? "Savings" : "Current" }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Balance Column -->
+        <ng-container matColumnDef="balance">
+          <th mat-header-cell *matHeaderCellDef>Balance</th>
+          <td mat-cell *matCellDef="let account" class="balance-cell">
+            {{ account.balance | currency }}
+          </td>
+        </ng-container>
+
+        <!-- Customer Column -->
+        <ng-container matColumnDef="customer">
+          <th mat-header-cell *matHeaderCellDef>Customer</th>
+          <td mat-cell *matCellDef="let account">
+            {{ account.customer?.name }}
+          </td>
+        </ng-container>
+
+        <!-- Details Column -->
+        <ng-container matColumnDef="details">
+          <th mat-header-cell *matHeaderCellDef>Details</th>
+          <td mat-cell *matCellDef="let account">
+            <div *ngIf="account.type === 'SavingAccount'">
+              Interest Rate: {{ account.interestRate }}%
+            </div>
+            <div *ngIf="account.type === 'CurrentAccount'">
+              Overdraft: {{ account.overDraft | currency }}
+            </div>
+            <div>Created: {{ account.createdAt | date : "mediumDate" }}</div>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let account">
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="selectAccount(account.id)"
+            >
+              View Details
             </button>
-            <button mat-raised-button color="warn" (click)="performOperation('debit')">
-              Debit
-            </button>
-            <button mat-raised-button (click)="performOperation('transfer')">
-              Transfer
-            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="accountsColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: accountsColumns"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<!-- No Accounts Found -->
+<div
+  *ngIf="!account && !isLoading && accounts.length === 0"
+  class="no-account-selected"
+>
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>No Accounts Found</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>
+        There are no accounts in the system or there was an error loading them.
+      </p>
+      <div class="action-buttons">
+        <button mat-raised-button color="primary" routerLink="/customers">
+          Go to Customers
+        </button>
+        <button mat-raised-button color="accent" (click)="reloadAccounts()">
+          Retry Loading Accounts
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<!-- API Error -->
+<div *ngIf="!account && !isLoading && apiError" class="api-error">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Error Loading Accounts</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>
+        There was an error communicating with the API. Please check that your
+        backend server is running.
+      </p>
+      <div class="error-details">
+        <pre>{{ apiError }}</pre>
+      </div>
+      <div class="action-buttons">
+        <button mat-raised-button color="primary" routerLink="/customers">
+          Go to Customers
+        </button>
+        <button mat-raised-button color="accent" (click)="reloadAccounts()">
+          Retry Loading Accounts
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<mat-card *ngIf="account">
+  <mat-card-header>
+    <mat-card-title>Account {{ account.id }}</mat-card-title>
+    <mat-card-subtitle>{{ account.type }} Account</mat-card-subtitle>
+    <button
+      mat-raised-button
+      color="primary"
+      routerLink="/accounts"
+      class="back-button"
+    >
+      Back to All Accounts
+    </button>
+  </mat-card-header>
+
+  <mat-card-content>
+    <mat-tab-group [(selectedIndex)]="activeTab">
+      <mat-tab label="Overview">
+        <div class="details-grid">
+          <div><strong>Account ID:</strong> {{ account.id }}</div>
+          <div>
+            <strong>Type:</strong>
+            {{ account.type === "SavingAccount" ? "Savings" : "Current" }}
           </div>
-        </mat-tab>
-  
-        <mat-tab label="All Operations">
-          <div class="loading-spinner" *ngIf="isLoading">
-            <mat-spinner diameter="50"></mat-spinner>
+          <div><strong>Balance:</strong> {{ account.balance | currency }}</div>
+          <div><strong>Created:</strong> {{ account.createdAt | date }}</div>
+
+          <!-- Account-specific details -->
+          <div *ngIf="account.type === 'SavingAccount'">
+            <strong>Interest Rate:</strong> {{ account.interestRate }}%
           </div>
-  
-          <table mat-table [dataSource]="operations" *ngIf="!isLoading">
+          <div *ngIf="account.type === 'CurrentAccount'">
+            <strong>Overdraft Limit:</strong> {{ account.overDraft | currency }}
+          </div>
+
+          <!-- Customer information -->
+          <div class="customer-info">
+            <strong>Customer:</strong> {{ account.customer.name }}
+          </div>
+          <div><strong>Email:</strong> {{ account.customer.email }}</div>
+        </div>
+
+        <div class="account-actions">
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="performOperation('credit')"
+          >
+            Credit
+          </button>
+          <button
+            mat-raised-button
+            color="warn"
+            (click)="performOperation('debit')"
+          >
+            Debit
+          </button>
+          <button mat-raised-button (click)="performOperation('transfer')">
+            Transfer
+          </button>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="All Operations">
+        <div class="loading-spinner" *ngIf="isLoading">
+          <mat-spinner diameter="50"></mat-spinner>
+        </div>
+
+        <table mat-table [dataSource]="operations" *ngIf="!isLoading">
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Date</th>
+            <td mat-cell *matCellDef="let op">
+              {{ op.operationDate | date : "medium" }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <td mat-cell *matCellDef="let op">
+              <span
+                [class.credit]="op.type === 'CREDIT'"
+                [class.debit]="op.type === 'DEBIT'"
+              >
+                {{ op.type }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef>Amount</th>
+            <td mat-cell *matCellDef="let op">{{ op.amount | currency }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef>Description</th>
+            <td mat-cell *matCellDef="let op">{{ op.description }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+
+        <div *ngIf="operations.length === 0 && !isLoading" class="no-results">
+          No operations found for this account
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Paged History">
+        <div class="loading-spinner" *ngIf="isLoading">
+          <mat-spinner diameter="50"></mat-spinner>
+        </div>
+
+        <div *ngIf="accountHistory && !isLoading">
+          <div class="balance-info">
+            Current Balance: {{ accountHistory.balance | currency }}
+          </div>
+
+          <table mat-table [dataSource]="accountHistory.accountOperationDTOS">
             <ng-container matColumnDef="date">
               <th mat-header-cell *matHeaderCellDef>Date</th>
-              <td mat-cell *matCellDef="let op">{{ op.operationDate | date:'medium' }}</td>
+              <td mat-cell *matCellDef="let op">
+                {{ op.operationDate | date : "medium" }}
+              </td>
             </ng-container>
-  
+
             <ng-container matColumnDef="type">
               <th mat-header-cell *matHeaderCellDef>Type</th>
               <td mat-cell *matCellDef="let op">
-                <span [class.credit]="op.type === 'CREDIT'" [class.debit]="op.type === 'DEBIT'">
+                <span
+                  [class.credit]="op.type === 'CREDIT'"
+                  [class.debit]="op.type === 'DEBIT'"
+                >
                   {{ op.type }}
                 </span>
               </td>
             </ng-container>
-  
+
             <ng-container matColumnDef="amount">
               <th mat-header-cell *matHeaderCellDef>Amount</th>
               <td mat-cell *matCellDef="let op">{{ op.amount | currency }}</td>
             </ng-container>
-  
+
             <ng-container matColumnDef="description">
               <th mat-header-cell *matHeaderCellDef>Description</th>
               <td mat-cell *matCellDef="let op">{{ op.description }}</td>
             </ng-container>
-  
+
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
           </table>
-  
-          <div *ngIf="operations.length === 0 && !isLoading" class="no-results">
-            No operations found for this account
-          </div>
-        </mat-tab>
-  
-        <mat-tab label="Paged History">
-          <div class="loading-spinner" *ngIf="isLoading">
-            <mat-spinner diameter="50"></mat-spinner>
-          </div>
-  
-          <div *ngIf="accountHistory && !isLoading">
-            <div class="balance-info">
-              Current Balance: {{ accountHistory.balance | currency }}
-            </div>
-  
-            <table mat-table [dataSource]="accountHistory.accountOperations">
-              <ng-container matColumnDef="date">
-                <th mat-header-cell *matHeaderCellDef>Date</th>
-                <td mat-cell *matCellDef="let op">{{ op.operationDate | date:'medium' }}</td>
-              </ng-container>
-  
-              <ng-container matColumnDef="type">
-                <th mat-header-cell *matHeaderCellDef>Type</th>
-                <td mat-cell *matCellDef="let op">
-                  <span [class.credit]="op.type === 'CREDIT'" [class.debit]="op.type === 'DEBIT'">
-                    {{ op.type }}
-                  </span>
-                </td>
-              </ng-container>
-  
-              <ng-container matColumnDef="amount">
-                <th mat-header-cell *matHeaderCellDef>Amount</th>
-                <td mat-cell *matCellDef="let op">{{ op.amount | currency }}</td>
-              </ng-container>
-  
-              <ng-container matColumnDef="description">
-                <th mat-header-cell *matHeaderCellDef>Description</th>
-                <td mat-cell *matCellDef="let op">{{ op.description }}</td>
-              </ng-container>
-  
-              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-            </table>
-  
-            <mat-paginator [length]="accountHistory.totalPages * accountHistory.pageSize"
-                           [pageSize]="accountHistory.pageSize"
-                           [pageIndex]="accountHistory.currentPage"
-                           [pageSizeOptions]="[5, 10, 25]"
-                           (page)="onPageChange($event)">
-            </mat-paginator>
-          </div>
-        </mat-tab>
-      </mat-tab-group>
-    </mat-card-content>
-  </mat-card>
+
+          <mat-paginator
+            [length]="accountHistory.totalPages * accountHistory.pageSize"
+            [pageSize]="accountHistory.pageSize"
+            [pageIndex]="accountHistory.currentPage"
+            [pageSizeOptions]="[5, 10, 25]"
+            (page)="onPageChange($event)"
+          >
+          </mat-paginator>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card-content>
+</mat-card>
