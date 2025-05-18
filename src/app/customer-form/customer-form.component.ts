@@ -24,7 +24,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     MatDatepickerModule
   ],
   templateUrl: './customer-form.component.html',
-  styleUrls: ['./customer-form.component.scss']
+  styleUrls: ['./customer-form.component.css']
 })
 export class CustomerFormComponent implements OnInit {
   isEditMode = false;
@@ -57,14 +57,11 @@ export class CustomerFormComponent implements OnInit {
   }
 
   loadCustomer(id: string): void {
-    this.customerService.getCustomer(id).subscribe({
+    this.customerService.getCustomer(Number(id)).subscribe({
       next: (customer) => {
         this.customerForm.patchValue({
-          firstName: customer.firstName,
-          lastName: customer.lastName,
+          firstName: customer.name,
           email: customer.email,
-          phone: customer.phone,
-          address: customer.address
         });
       },
       error: (err) => console.error('Failed to load customer', err)
@@ -77,7 +74,7 @@ export class CustomerFormComponent implements OnInit {
     const customerData = this.customerForm.value as Omit<Customer, 'id'>;
 
     if (this.isEditMode && this.customerId) {
-      this.customerService.updateCustomer(this.customerId, customerData).subscribe({
+      this.customerService.updateCustomer(Number(this.customerId), customerData).subscribe({
         next: () => this.router.navigate(['/customers', this.customerId]),
         error: (err) => console.error('Failed to update customer', err)
       });

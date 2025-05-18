@@ -1,58 +1,91 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CustomerService } from '../services/customer.service';
-import { Customer, CustomerHistory } from '../models/customer';
+import { AccountService } from '../services/account.service';
+import { Customer } from '../models/customer';
+import { BankAccount } from '../models/account';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { CustomerHistoryComponent } from '../customer-history/customer-history.component';
+import { MatTableModule } from '@angular/material/table';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-customer-details',
   standalone: true,
   imports: [
     CommonModule,
-    RouterModule,
     MatCardModule,
     MatTabsModule,
     MatButtonModule,
     MatIconModule,
-    CustomerHistoryComponent
+    MatTableModule,
+    MatProgressSpinnerModule,
+    RouterModule
   ],
   templateUrl: './customer-details.component.html',
   styleUrls: ['./customer-details.component.css']
 })
 export class CustomerDetailsComponent implements OnInit {
   customer?: Customer;
-  history: CustomerHistory[] = [];
-  activeTab = 'details';
+  accounts: BankAccount[] = [];
+  isLoading = false;
+  activeTab = 0;
+  
+  displayedColumns: string[] = ['id', 'type', 'balance', 'actions'];
 
   constructor(
     private route: ActivatedRoute,
-    private customerService: CustomerService
+    private router: Router,
+    private customerService: CustomerService,
+    private accountService: AccountService
   ) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.loadCustomer(id);
-      this.loadCustomerHistory(id);
+      this.loadCustomer(+id);
+      this.loadCustomerAccounts(+id);
     }
   }
 
-  loadCustomer(id: string): void {
+  loadCustomer(id: number): void {
+    this.isLoading = true;
     this.customerService.getCustomer(id).subscribe({
-      next: (customer) => this.customer = customer,
-      error: (err) => console.error('Failed to load customer', err)
+      next: (customer) => {
+        this.customer = customer;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to load customer', err);
+        this.isLoading = false;
+      }
     });
   }
 
-  loadCustomerHistory(id: string): void {
-    this.customerService.getCustomerHistory(id).subscribe({
-      next: (history) => this.history = history,
-      error: (err) => console.error('Failed to load customer history', err)
+  loadCustomerAccounts(customerId: number): void {
+    this.isLoading = true;
+    this.accountService.getAccounts().subscribe({
+      next: (accounts) => {
+        this.accounts = accounts.filter(acc => acc.customerId === customerId);
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to load accounts', err);
+        this.isLoading = false;
+      }
     });
+  }
+
+  viewAccount(accountId: string): void {
+    this.router.navigate(['/accounts', accountId]);
+  }
+
+  createAccount(): void {
+    if (this.customer) {
+      this.router.navigate(['/customers', this.customer.id, 'new-account']);
+    }
   }
 }

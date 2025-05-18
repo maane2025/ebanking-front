@@ -1,9 +1,43 @@
-<mat-toolbar color="primary">
-    <span>{{ title }}</span>
+<mat-toolbar color="primary" class="app-toolbar">
+  <div class="toolbar-content">
+    <div class="branding" routerLink="/">
+     
+      <span class="app-title">{{ title }}</span>
+    </div>
+    
     <span class="spacer"></span>
-    <a mat-button routerLink="/customers" routerLinkActive="active">Customers</a>
-  </mat-toolbar>
-  
-  <main>
-    <router-outlet></router-outlet>
-  </main>
+    
+    <nav class="nav-links">
+      <button class="btn  mx-3" routerLink="/customers" >
+        Customers
+      </button>
+      <button class="btn  mx-3" routerLink="/accounts">
+        
+        Accounts
+      </button>
+      <a class="btn  mx-3" routerLink="/transactions">
+       
+        Transactions
+      </a>
+    </nav>
+    
+    <!-- <div class="user-section">
+      <button mat-icon-button [matMenuTriggerFor]="userMenu">
+        account_circle
+      </button>
+      <mat-menu #userMenu="matMenu">
+        <button mat-menu-item>
+          Settings
+        </button>
+        <button mat-menu-item>
+          <mat-icon>logout</mat-icon>
+          Logout
+        </button>
+      </mat-menu>
+    </div> -->
+  </div>
+</mat-toolbar>
+
+<main class="app-content">
+  <router-outlet></router-outlet>
+</main>

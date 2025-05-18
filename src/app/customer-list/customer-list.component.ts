@@ -1,50 +1,99 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 import { CustomerService } from '../services/customer.service';
 import { Customer } from '../models/customer';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
-
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { FormsModule } from '@angular/forms';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-customer-list',
   standalone: true,
   imports: [
     CommonModule,
-    RouterModule,
     MatTableModule,
     MatButtonModule,
     MatIconModule,
-    MatCardModule
+    MatCardModule,
+    MatInputModule,
+    MatFormFieldModule,
+    FormsModule,
+    MatProgressSpinnerModule,
+    RouterModule
   ],
   templateUrl: './customer-list.component.html',
   styleUrls: ['./customer-list.component.css']
 })
 export class CustomerListComponent implements OnInit {
   customers: Customer[] = [];
-  displayedColumns: string[] = ['name', 'email', 'phone', 'actions'];
+  displayedColumns: string[] = ['id', 'name', 'email', 'actions'];
+  searchKeyword: string = '';
+  isLoading: boolean = false;
 
-  constructor(private customerService: CustomerService) {}
+  constructor(
+    private customerService: CustomerService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadCustomers();
   }
 
   loadCustomers(): void {
+    this.isLoading = true;
     this.customerService.getCustomers().subscribe({
-      next: (customers) => this.customers = customers,
-      error: (err) => console.error('Failed to load customers', err)
+      next: (customers) => {
+        this.customers = customers;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to load customers', err);
+        this.isLoading = false;
+      }
     });
   }
 
-  deleteCustomer(id: string): void {
+  searchCustomers(): void {
+    if (this.searchKeyword.trim() === '') {
+      this.loadCustomers();
+      return;
+    }
+
+    this.isLoading = true;
+    this.customerService.searchCustomers(this.searchKeyword).subscribe({
+      next: (customers) => {
+        this.customers = customers;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to search customers', err);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  editCustomer(id: number): void {
+    this.router.navigate(['/customers', id, 'edit']);
+  }
+
+  deleteCustomer(id: number): void {
     if (confirm('Are you sure you want to delete this customer?')) {
+      this.isLoading = true;
       this.customerService.deleteCustomer(id).subscribe({
-        next: () => this.loadCustomers(),
-        error: (err) => console.error('Failed to delete customer', err)
+        next: () => {
+          this.loadCustomers();
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Failed to delete customer', err);
+          this.isLoading = false;
+        }
       });
     }
   }

@@ -1,30 +1,69 @@
-<ng-container *ngIf="customer">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>
-          {{ customer.firstName }} {{ customer.lastName }}
-        </mat-card-title>
-        <mat-card-subtitle>Customer Details</mat-card-subtitle>
-        <button mat-icon-button [routerLink]="['/customers', customer.id, 'edit']">
-          <mat-icon>edit</mat-icon>
-        </button>
-      </mat-card-header>
+<mat-card *ngIf="customer">
+  <mat-card-header>
+    <mat-card-title>{{ customer.name }}</mat-card-title>
+    <mat-card-subtitle>Customer Details</mat-card-subtitle>
+    <button mat-icon-button 
   
-      <mat-card-content>
-        <mat-tab-group [(selectedIndex)]="activeTab">
-          <mat-tab label="Details">
-            <div class="details-grid">
-              <div><strong>Email:</strong> {{ customer.email }}</div>
-              <div><strong>Phone:</strong> {{ customer.phone }}</div>
-              <div><strong>Address:</strong> {{ customer.address }}</div>
-              <div><strong>Created:</strong> {{ customer.createdAt | date }}</div>
-              <div><strong>Last Updated:</strong> {{ customer.updatedAt | date }}</div>
-            </div>
-          </mat-tab>
-          <!-- <mat-tab label="History">
-            <app-customer-history [history]="history"></app-customer-history>
-          </mat-tab> -->
-        </mat-tab-group>
-      </mat-card-content>
-    </mat-card>
-  </ng-container>
+    routerLink="/customers/{{customer.id}}/edit/">
+      
+      <mat-icon>edit</mat-icon>
+    </button>
+  </mat-card-header>
+
+  <mat-card-content>
+    <mat-tab-group [(selectedIndex)]="activeTab">
+      <mat-tab label="Details">
+        <div class="details-grid">
+          <div><strong>ID:</strong> {{ customer.id }}</div>
+          <div><strong>Name:</strong> {{ customer.name }}</div>
+          <div><strong>Email:</strong> {{ customer.email }}</div>
+        </div>
+      </mat-tab>
+      
+      <mat-tab label="Accounts">
+        <div class="accounts-actions">
+          <button mat-raised-button color="primary" (click)="createAccount()">
+            Create New Account
+          </button>
+        </div>
+        
+        <div class="loading-spinner" *ngIf="isLoading">
+          <mat-spinner diameter="50"></mat-spinner>
+        </div>
+
+        <table mat-table [dataSource]="accounts" *ngIf="!isLoading">
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>Account ID</th>
+            <td mat-cell *matCellDef="let account">{{ account.id }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <td mat-cell *matCellDef="let account">{{ account.type }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="balance">
+            <th mat-header-cell *matHeaderCellDef>Balance</th>
+            <td mat-cell *matCellDef="let account">{{ account.balance | currency }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let account">
+              <button mat-icon-button (click)="viewAccount(account.id)">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <div *ngIf="accounts.length === 0 && !isLoading" class="no-results">
+          No accounts found for this customer
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card-content>
+</mat-card>
