@@ -75,7 +75,7 @@
   min-height: 48px;
 }
 
-::ng-deep .user-dropdown .mat-mdc-menu-item mat-icon {
+::ng-deep .user-dropdown .mat-mdc-menu-item i {
   margin-right: 12px;
   color: #666;
 }

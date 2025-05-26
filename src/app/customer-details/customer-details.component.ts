@@ -8,7 +8,6 @@ import { BankAccount } from '../models/account';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
@@ -20,7 +19,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatCardModule,
     MatTabsModule,
     MatButtonModule,
-    MatIconModule,
     MatTableModule,
     MatProgressSpinnerModule,
     RouterModule,
@@ -69,7 +67,9 @@ export class CustomerDetailsComponent implements OnInit {
     this.isLoading = true;
     this.accountService.getAccounts().subscribe({
       next: (accounts) => {
-        this.accounts = accounts.filter((acc) => acc.customer.id === customerId);
+        this.accounts = accounts.filter(
+          (acc) => acc.customer.id === customerId
+        );
         this.isLoading = false;
       },
       error: (err) => {

@@ -1,12 +1,16 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Subject, takeUntil } from 'rxjs';
@@ -24,12 +28,11 @@ import { LoginRequest } from '../../models/auth';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatIconModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
   ],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.css'],
 })
 export class LoginComponent implements OnInit, OnDestroy {
   loginForm: FormGroup;
@@ -47,7 +50,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   ) {
     this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
 
@@ -58,17 +61,17 @@ export class LoginComponent implements OnInit, OnDestroy {
     // Subscribe to auth state changes
     this.authService.authState$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(authState => {
+      .subscribe((authState) => {
         this.loading = authState.loading;
-        
+
         if (authState.isAuthenticated) {
           this.router.navigate([this.returnUrl]);
         }
-        
+
         if (authState.error) {
           this.snackBar.open(authState.error, 'Close', {
             duration: 5000,
-            panelClass: ['error-snackbar']
+            panelClass: ['error-snackbar'],
           });
         }
       });
@@ -87,17 +90,17 @@ export class LoginComponent implements OnInit, OnDestroy {
   onSubmit(): void {
     if (this.loginForm.valid) {
       const credentials: LoginRequest = this.loginForm.value;
-      
+
       this.authService.login(credentials).subscribe({
         next: (response) => {
           this.snackBar.open('Login successful!', 'Close', {
             duration: 3000,
-            panelClass: ['success-snackbar']
+            panelClass: ['success-snackbar'],
           });
         },
         error: (error) => {
           console.error('Login error:', error);
-        }
+        },
       });
     } else {
       this.markFormGroupTouched();
@@ -105,7 +108,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   private markFormGroupTouched(): void {
-    Object.keys(this.loginForm.controls).forEach(key => {
+    Object.keys(this.loginForm.controls).forEach((key) => {
       const control = this.loginForm.get(key);
       control?.markAsTouched();
     });
@@ -113,16 +116,20 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   getErrorMessage(fieldName: string): string {
     const control = this.loginForm.get(fieldName);
-    
+
     if (control?.hasError('required')) {
-      return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`;
+      return `${
+        fieldName.charAt(0).toUpperCase() + fieldName.slice(1)
+      } is required`;
     }
-    
+
     if (control?.hasError('minlength')) {
       const requiredLength = control.errors?.['minlength']?.requiredLength;
-      return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must be at least ${requiredLength} characters`;
+      return `${
+        fieldName.charAt(0).toUpperCase() + fieldName.slice(1)
+      } must be at least ${requiredLength} characters`;
     }
-    
+
     return '';
   }
 }

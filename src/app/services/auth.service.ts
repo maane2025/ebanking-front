@@ -11,45 +11,42 @@ import {
   RegisterRequest,
   RegisterResponse,
   AuthState,
-  JwtPayload
+  JwtPayload,
 } from '../models/auth';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private apiUrl = 'http://localhost:8080/auth';
   private tokenKey = 'e-banking-token';
   private userKey = 'e-banking-user';
-  
+
   private authStateSubject = new BehaviorSubject<AuthState>({
     isAuthenticated: false,
     user: null,
     token: null,
     loading: false,
-    error: null
+    error: null,
   });
 
   public authState$ = this.authStateSubject.asObservable();
 
-  constructor(
-    private http: HttpClient,
-    private router: Router
-  ) {
+  constructor(private http: HttpClient, private router: Router) {
     this.initializeAuth();
   }
 
   private initializeAuth(): void {
     const token = this.getStoredToken();
     const user = this.getStoredUser();
-    
+
     if (token && user && this.isTokenValid(token)) {
       this.updateAuthState({
         isAuthenticated: true,
         user,
         token,
         loading: false,
-        error: null
+        error: null,
       });
       this.scheduleTokenRefresh(token);
     } else {
@@ -58,31 +55,46 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    this.updateAuthState({ ...this.authStateSubject.value, loading: true, error: null });
-    
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
-      tap(response => {
-        this.handleAuthSuccess(response);
-      }),
-      catchError(error => {
-        this.handleAuthError(error);
-        return throwError(() => error);
-      })
-    );
+    this.updateAuthState({
+      ...this.authStateSubject.value,
+      loading: true,
+      error: null,
+    });
+
+    return this.http
+      .post<LoginResponse>(`${this.apiUrl}/login`, credentials)
+      .pipe(
+        tap((response) => {
+          this.handleAuthSuccess(response);
+        }),
+        catchError((error) => {
+          this.handleAuthError(error);
+          return throwError(() => error);
+        })
+      );
   }
 
   register(userData: RegisterRequest): Observable<RegisterResponse> {
-    this.updateAuthState({ ...this.authStateSubject.value, loading: true, error: null });
-    
-    return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, userData).pipe(
-      catchError(error => {
-        this.handleAuthError(error);
-        return throwError(() => error);
-      }),
-      tap(() => {
-        this.updateAuthState({ ...this.authStateSubject.value, loading: false });
-      })
-    );
+    this.updateAuthState({
+      ...this.authStateSubject.value,
+      loading: true,
+      error: null,
+    });
+
+    return this.http
+      .post<RegisterResponse>(`${this.apiUrl}/register`, userData)
+      .pipe(
+        catchError((error) => {
+          this.handleAuthError(error);
+          return throwError(() => error);
+        }),
+        tap(() => {
+          this.updateAuthState({
+            ...this.authStateSubject.value,
+            loading: false,
+          });
+        })
+      );
   }
 
   logout(): void {
@@ -92,7 +104,7 @@ export class AuthService {
       user: null,
       token: null,
       loading: false,
-      error: null
+      error: null,
     });
     this.router.navigate(['/login']);
   }
@@ -103,15 +115,17 @@ export class AuthService {
       return throwError(() => new Error('No token available'));
     }
 
-    return this.http.post<LoginResponse>(`${this.apiUrl}/refresh`, { token }).pipe(
-      tap(response => {
-        this.handleAuthSuccess(response);
-      }),
-      catchError(error => {
-        this.logout();
-        return throwError(() => error);
-      })
-    );
+    return this.http
+      .post<LoginResponse>(`${this.apiUrl}/refresh`, { token })
+      .pipe(
+        tap((response) => {
+          this.handleAuthSuccess(response);
+        }),
+        catchError((error) => {
+          this.logout();
+          return throwError(() => error);
+        })
+      );
   }
 
   getCurrentUser(): User | null {
@@ -134,13 +148,13 @@ export class AuthService {
   private handleAuthSuccess(response: LoginResponse): void {
     this.storeToken(response.token);
     this.storeUser(response.user);
-    
+
     this.updateAuthState({
       isAuthenticated: true,
       user: response.user,
       token: response.token,
       loading: false,
-      error: null
+      error: null,
     });
 
     this.scheduleTokenRefresh(response.token);
@@ -148,7 +162,7 @@ export class AuthService {
 
   private handleAuthError(error: HttpErrorResponse): void {
     let errorMessage = 'An error occurred during authentication';
-    
+
     if (error.error?.message) {
       errorMessage = error.error.message;
     } else if (error.status === 401) {
@@ -162,7 +176,7 @@ export class AuthService {
     this.updateAuthState({
       ...this.authStateSubject.value,
       loading: false,
-      error: errorMessage
+      error: errorMessage,
     });
   }
 
@@ -179,12 +193,26 @@ export class AuthService {
   }
 
   private getStoredToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    const token = localStorage.getItem(this.tokenKey);
+    if (!token || token === 'undefined' || token === 'null') {
+      return null;
+    }
+    return token;
   }
 
   private getStoredUser(): User | null {
     const userStr = localStorage.getItem(this.userKey);
-    return userStr ? JSON.parse(userStr) : null;
+    if (!userStr || userStr === 'undefined') {
+      return null;
+    }
+    try {
+      return JSON.parse(userStr);
+    } catch (error) {
+      console.error('Error parsing stored user data:', error);
+      // Clear invalid data
+      localStorage.removeItem(this.userKey);
+      return null;
+    }
   }
 
   private clearStoredAuth(): void {
@@ -193,11 +221,15 @@ export class AuthService {
   }
 
   private isTokenValid(token: string): boolean {
+    if (!token || token === 'undefined' || token === 'null') {
+      return false;
+    }
     try {
       const decoded: JwtPayload = jwtDecode(token);
       const currentTime = Date.now() / 1000;
       return decoded.exp > currentTime;
-    } catch {
+    } catch (error) {
+      console.error('Error validating token:', error);
       return false;
     }
   }
@@ -207,13 +239,13 @@ export class AuthService {
       const decoded: JwtPayload = jwtDecode(token);
       const expirationTime = decoded.exp * 1000;
       const currentTime = Date.now();
-      const refreshTime = expirationTime - currentTime - (5 * 60 * 1000); // Refresh 5 minutes before expiry
+      const refreshTime = expirationTime - currentTime - 5 * 60 * 1000; // Refresh 5 minutes before expiry
 
       if (refreshTime > 0) {
         timer(refreshTime).subscribe(() => {
           if (this.isAuthenticated()) {
             this.refreshToken().subscribe({
-              error: () => this.logout()
+              error: () => this.logout(),
             });
           }
         });

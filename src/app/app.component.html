@@ -4,7 +4,7 @@
 >
   <div class="container">
     <a class="navbar-brand" routerLink="/">
-      <mat-icon class="me-2">account_balance</mat-icon>
+      <i class="bi bi-bank me-2"></i>
       {{ title }}
     </a>
 
@@ -24,12 +24,12 @@
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
           <a class="nav-link" routerLink="/customers" routerLinkActive="active">
-            <mat-icon class="me-1">people</mat-icon> Customers
+            <i class="bi bi-people me-1"></i> Customers
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" routerLink="/accounts" routerLinkActive="active">
-            <mat-icon class="me-1">account_balance_wallet</mat-icon> Accounts
+            <i class="bi bi-wallet2 me-1"></i> Accounts
           </a>
         </li>
       </ul>
@@ -38,9 +38,9 @@
       <div class="navbar-nav">
         <div class="nav-item dropdown" [matMenuTriggerFor]="userMenu">
           <button mat-button class="nav-link user-menu-trigger">
-            <mat-icon class="me-1">account_circle</mat-icon>
+            <i class="bi bi-person-circle me-1"></i>
             {{ getUserDisplayName() }}
-            <mat-icon class="ms-1">arrow_drop_down</mat-icon>
+            <i class="bi bi-chevron-down ms-1"></i>
           </button>
         </div>
       </div>
@@ -56,7 +56,7 @@
   </div>
   <mat-divider></mat-divider>
   <button mat-menu-item (click)="logout()">
-    <mat-icon>logout</mat-icon>
+    <i class="bi bi-box-arrow-right"></i>
     <span>Logout</span>
   </button>
 </mat-menu>
