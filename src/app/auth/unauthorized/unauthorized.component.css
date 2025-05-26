@@ -1,0 +1,87 @@
+.unauthorized-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.unauthorized-wrapper {
+  width: 100%;
+  max-width: 500px;
+}
+
+.unauthorized-card {
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  background: white;
+}
+
+.unauthorized-content {
+  text-align: center;
+}
+
+.unauthorized-icon {
+  font-size: 4rem;
+  width: 4rem;
+  height: 4rem;
+  color: #f44336;
+  margin-bottom: 1rem;
+}
+
+.unauthorized-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.unauthorized-message {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.unauthorized-submessage {
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 2rem;
+}
+
+.unauthorized-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.unauthorized-actions button {
+  min-width: 140px;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .unauthorized-container {
+    padding: 10px;
+  }
+  
+  .unauthorized-card {
+    padding: 1.5rem;
+  }
+  
+  .unauthorized-title {
+    font-size: 1.5rem;
+  }
+  
+  .unauthorized-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .unauthorized-actions button {
+    width: 100%;
+    max-width: 200px;
+  }
+}
